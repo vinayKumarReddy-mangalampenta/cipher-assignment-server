@@ -63,8 +63,7 @@ const register = async (req, res) => {
         }
 
         const newUser = await users.insertOne(doc)
-        createProfile({ id: newUserId, username, firstName, email, lastName, aboutMe: "", gender: "Male", linkedIn: "", facebook: "", github: "", twitter: "", instagram: "", website: "", highestEducation: "Graduation", currentPosition: "College Student" }
-        )
+        createProfile({ id: newUserId, username, firstName, email, lastName, aboutMe: "", gender: "Male", linkedIn: "", facebook: "", github: "", twitter: "", instagram: "", website: "", highestEducation: "Graduation", currentPosition: "College Student" })
         res.send({ response: "user created successfully" })
     }
     catch (error) {
@@ -88,5 +87,42 @@ const createProfile = async (user = defaultUserProfile) => {
 }
 
 
+const changePassword = async (req, res) => {
+    const { currentPassword, newPassword, confirmPassword } = req.body
+    if (!newPassword || !confirmPassword) {
+        res.status(401)
+        res.send("Input fields not enough")
+    }
 
-module.exports = { login, register }
+    if (newPassword !== confirmPassword) {
+        res.status(401)
+        res.send("password mismatch")
+        return
+    }
+    const database = client.db("vinay");
+    const users = database.collection("users");
+
+    const user = await users.findOne({ username: req.username })
+
+    const isPasswordMatched = await bcrypt.compare(currentPassword, user.password);
+
+    if (isPasswordMatched === true) {
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+        const response = users.updateOne({ username: req.username },
+            {
+                $set: {
+                    password: hashedPassword
+                }
+            })
+
+        res.send({ data: "password changed successfully" })
+        return
+    } else {
+        res.status(400);
+        res.send("Invalid Password");
+    }
+}
+
+
+module.exports = { login, register, changePassword }
