@@ -56,16 +56,18 @@ connectToDb()
 
 
 App.get("/", async (req, res) => {
-    try {
-        const database = client.db("vinay");
-        const users = database.collection("users");
-        const user = await users.findOne({});
-        console.log(user)
-        res.send(user);
-    } catch (error) {
-        console.log("Error while reading data from database", error);
-        res.status(500).send("Error while reading data from database");
-    }
+    // try {
+    //     const database = client.db("vinay");
+    //     const users = database.collection("users");
+    //     const user = await users.findOne({});
+    //     console.log(user)
+    //     res.send(user);
+    // } catch (error) {
+    //     console.log("Error while reading data from database", error);
+    //     res.status(500).send("Error while reading data from database");
+    // }
+
+    res.send("welcome to vinay API")
 
 })
 
