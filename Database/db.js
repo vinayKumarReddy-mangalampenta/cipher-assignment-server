@@ -1,7 +1,8 @@
 const { MongoClient, ServerApiVersion } = require('mongodb');
+const mongoose = require("mongoose")
 var password = encodeURIComponent("Lordganesh@1234")
 let database;
-const uri = `mongodb+srv://vinayreddy:${password}@vinay.ztri9vu.mongodb.net/?retryWrites=true&w=majority`;
+const uri = `mongodb+srv://vinayreddy:${password}@vinay.ztri9vu.mongodb.net/vinay?retryWrites=true&w=majority`;
 
 const client = new MongoClient(uri, {
     serverApi: {
@@ -11,41 +12,6 @@ const client = new MongoClient(uri, {
     }
 });
 
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 module.exports = { client }
-
-/*
-
- ? SCHEMAS
-
- user = {
- username ,
- firstname,
- lastname,
- email, 
- password
- } 
-
-
- profile = {
- firstName,
- lastName,
- About me, 
- gender;
- linkedIn,
- facebook,
- github,
- twitter,
- instagram,
- website,
- highestEducation,
- currentPosition
-
- }
- 
-
-
-
-
-
-*/

@@ -1,9 +1,8 @@
 const express = require("express")
 const cors = require("cors")
 const dotenv = require("dotenv")
-
+const mongoose = require("mongoose")
 const { client } = require("./Database/db")
-
 
 
 // *server initialization  properties and environment configuration
@@ -14,22 +13,22 @@ dotenv.config()
 
 
 const authRoute = require("./Apis/Authentication/routes")
+const profileRoute = require("./Apis/Profile/routes")
 
 
-
-
-// TODO: db connection
 
 
 const connectToDb = async () => {
     try {
         await client.connect();
         await client.db("admin").command({ ping: 1 });
+
         console.log("Pinged your deployment. You successfully connected to MongoDB!");
 
         App.listen(process.env.PORT || 8000, () => {
             console.log(`server started on ${process.env.PORT || 8000}.`);
         });
+
     } catch (error) {
         console.log("Unable to connect to mongo db", error);
         process.exit(1);
@@ -48,6 +47,14 @@ process.on("SIGINT", () => {
 
 connectToDb()
 
+
+
+
+
+
+
+
+
 App.get("/", async (req, res) => {
     try {
         const database = client.db("vinay");
@@ -64,7 +71,7 @@ App.get("/", async (req, res) => {
 
 
 App.use("/Auth", authRoute)
-
+App.use("/profile", profileRoute)
 
 
 
