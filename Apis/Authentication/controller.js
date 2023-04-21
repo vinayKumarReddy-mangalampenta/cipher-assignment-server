@@ -6,12 +6,12 @@ const jwt = require("jsonwebtoken")
 const Profile = require("../../Schemas/profile")
 
 const login = async (req, res) => {
-    const { email, password } = req.body
+    const { username, password } = req.body
 
     const database = client.db("vinay");
     const users = database.collection("users");
 
-    const user = await users.findOne({ email })
+    const user = await users.findOne({ username })
     if (!user) {
         res.status(400);
         res.send("Invalid User");
