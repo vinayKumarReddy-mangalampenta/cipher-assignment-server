@@ -95,6 +95,48 @@ const getAvailableUserProfiles = async (req, res) => {
 }
 
 
+const getMyFollowersList = async (req, res) => {
+    try {
+        // people followed by me 
+        let followingList = await Following.find({ followerId: req.id }, {
+            followingId: 1
+        })
+
+        followingList = followingList.map((each) => (each.followingId))
+
+
+        // people following me
+        let followersList = await Following.find({ followingId: req.id }, {
+            followerId: 1,
+        })
+        followersList = followersList.map((each) => (each.followerId))
+
+
+
+
+        let followerUsers = await Profile.find({ id: { $in: followersList } });
+
+        followerUsers = followerUsers.map((each) => ({
+            ...each._doc,
+            isFollowing: followingList.includes(each.id)
+        })
+        )
+
+
+
+
+        let users = followerUsers
+
+        res.send({ users })
+
+    } catch (error) {
+        console.log(error)
+        res.status(400)
+        res.send({ error })
+    }
+}
+
+
 const followOrUnFollowUser = async (req, res) => {
     const { followingId } = req.body
 
@@ -120,4 +162,4 @@ const followOrUnFollowUser = async (req, res) => {
 
 }
 
-module.exports = { getProfile, followOrUnFollowUser, getAvailableUserProfiles, updateProfile }
+module.exports = { getProfile, getMyFollowersList, followOrUnFollowUser, getAvailableUserProfiles, updateProfile }
