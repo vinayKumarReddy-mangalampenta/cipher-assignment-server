@@ -1,6 +1,8 @@
 const uuid = require("uuid")
 const Following = require("../../Schemas/following")
 const Profile = require("../../Schemas/profile")
+const MyInterests = require("../../Schemas/myIntersets")
+const Interests = require("../../Schemas/interests")
 
 
 const getProfile = async (req, res) => {
@@ -13,8 +15,10 @@ const getProfile = async (req, res) => {
             return
         }
         console.log(userProfile)
+
+        const userInterests = await MyInterests.findOne({ userId: userProfile.id })
         const followersCount = await Following.countDocuments({ followingId: userProfile.id })
-        res.send({ userProfile, followersCount })
+        res.send({ userProfile, followersCount, userInterests: userInterests.interests })
     }
     catch (error) {
 
@@ -170,4 +174,64 @@ const followOrUnFollowUser = async (req, res) => {
 
 }
 
-module.exports = { getProfile, getMyFollowersList, followOrUnFollowUser, getAvailableUserProfiles, updateProfile }
+
+
+const addDeleteInterests = async (req, res) => {
+    const { interestValue } = req.body
+    try {
+
+        var interest = await Interests.findOne({ value: interestValue })
+
+        if (!interest) {
+            interest = new Interests({ _id: uuid.v4(), value: interestValue })
+            await interest.save()
+        }
+
+
+
+        const myInterests = await MyInterests.findOne({ userId: req.id }, { interests: 1 })//.populate("interests");
+        const interestsIds = myInterests.interests.map((each) => each._id);
+        let updatedInterests = myInterests.interests
+
+        if (interestsIds.includes(interest._id)) {
+            updatedInterests = updatedInterests.filter((each) => each._id !== interest.id)
+            await MyInterests.findOneAndUpdate(
+                { userId: req.id },
+                { interests: updatedInterests },
+                { new: true }
+            );
+            res.send("successfully removed")
+
+        } else {
+
+            updatedInterests.push(interest)
+
+
+            await MyInterests.findOneAndUpdate(
+                { userId: req.id },
+                { interests: updatedInterests },
+                { new: true }
+            );
+
+            res.send("successfully added")
+        }
+
+    } catch (error) {
+        res.status(400)
+        res.send({ error })
+    }
+
+}
+
+const getMyInterests = async (req, res) => {
+    try {
+        const userInterests = await MyInterests.findOne({ userId: req.id })
+        res.send({ userInterests: userInterests.interests })
+    }
+    catch (error) {
+        res.status(400)
+        res.send({ error })
+    }
+}
+
+module.exports = { getProfile, getMyFollowersList, followOrUnFollowUser, getAvailableUserProfiles, updateProfile, addDeleteInterests, getMyInterests }

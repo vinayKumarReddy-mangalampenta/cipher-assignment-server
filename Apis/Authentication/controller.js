@@ -4,6 +4,7 @@ const bcrypt = require("bcrypt")
 const jwt = require("jsonwebtoken")
 
 const Profile = require("../../Schemas/profile")
+const MyInterests = require("../../Schemas/myIntersets")
 
 const login = async (req, res) => {
     const { username, password } = req.body
@@ -64,6 +65,7 @@ const register = async (req, res) => {
 
         const newUser = await users.insertOne(doc)
         createProfile({ id: newUserId, username, firstName, email, lastName, aboutMe: "", gender: "Male", linkedIn: "", facebook: "", github: "", twitter: "", instagram: "", website: "", highestEducation: "Graduation", currentPosition: "College Student" })
+        createInterests({ userId: newUserId })
         res.send({ response: "user created successfully" })
     }
     catch (error) {
@@ -76,12 +78,26 @@ const register = async (req, res) => {
 const createProfile = async (user = defaultUserProfile) => {
     const database = client.db("vinay");
     const newProfile = new Profile(user)
-    console.log(user)
     try {
         newProfile.save()
         console.log("Profile Saved......")
     } catch (error) {
         console.error('Error saving profile:', error);
+    }
+
+}
+
+const createInterests = async ({ userId }) => {
+    const newInterests = new MyInterests({
+        _id: uuid.v4(),
+        userId,
+        interests: []
+    })
+    try {
+        newInterests.save()
+        console.log(" Saved......")
+    } catch (error) {
+        console.error('Error saving :', error);
     }
 
 }
