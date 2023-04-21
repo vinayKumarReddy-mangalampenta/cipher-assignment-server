@@ -5,7 +5,7 @@ const router = require("express").Router()
 
 
 router.get("/:username", authenticateToken, getProfile)
-router.get("/users/my-followers", authenticateToken, getMyFollowersList)
+router.get("/followers/:username", authenticateToken, getMyFollowersList)
 router.post("/follow-unfollow-user", authenticateToken, followOrUnFollowUser)
 router.put("/update", authenticateToken, updateProfile)
 router.get("/users/all", authenticateToken, getAvailableUserProfiles)

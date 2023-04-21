@@ -96,7 +96,15 @@ const getAvailableUserProfiles = async (req, res) => {
 
 
 const getMyFollowersList = async (req, res) => {
+    const { username } = req.params
     try {
+        // getting user profile 
+        const profile = await Profile.findOne({ username });
+        if (!profile) {
+            res.status(400)
+            res.send({ error })
+        }
+
         // people followed by me 
         let followingList = await Following.find({ followerId: req.id }, {
             followingId: 1
@@ -106,7 +114,7 @@ const getMyFollowersList = async (req, res) => {
 
 
         // people following me
-        let followersList = await Following.find({ followingId: req.id }, {
+        let followersList = await Following.find({ followingId: profile.id }, {
             followerId: 1,
         })
         followersList = followersList.map((each) => (each.followerId))
